@@ -25,13 +25,17 @@ namespace practica1
             this.guardarComoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.salirToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.richTextBox1 = new System.Windows.Forms.RichTextBox();
+            this.compilarToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.analizarToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.richTextBox2 = new System.Windows.Forms.RichTextBox();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             //
             // menuStrip1
             //
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.archivoToolStripMenuItem});
+            this.archivoToolStripMenuItem,
+            this.compilarToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.Size = new System.Drawing.Size(800, 24);
@@ -85,6 +89,21 @@ namespace practica1
             this.salirToolStripMenuItem.Text = "Salir";
             this.salirToolStripMenuItem.Click += new System.EventHandler(this.salirToolStripMenuItem_Click);
             //
+            // compilarToolStripMenuItem
+            //
+            this.compilarToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.analizarToolStripMenuItem});
+            this.compilarToolStripMenuItem.Name = "compilarToolStripMenuItem";
+            this.compilarToolStripMenuItem.Size = new System.Drawing.Size(64, 20);
+            this.compilarToolStripMenuItem.Text = "Compilar";
+            //
+            // analizarToolStripMenuItem
+            //
+            this.analizarToolStripMenuItem.Name = "analizarToolStripMenuItem";
+            this.analizarToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.analizarToolStripMenuItem.Text = "Analizar";
+            this.analizarToolStripMenuItem.Click += new System.EventHandler(this.analizarToolStripMenuItem_Click);
+            //
             // richTextBox1
             //
             this.richTextBox1.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -93,6 +112,16 @@ namespace practica1
             this.richTextBox1.Size = new System.Drawing.Size(800, 426);
             this.richTextBox1.TabIndex = 1;
             this.richTextBox1.Text = "";
+            this.richTextBox1.TextChanged += new System.EventHandler(this.richTextBox1_TextChanged);
+            //
+            // richtextbox2
+            //
+            this.richtextbox2.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.richtextbox2.Location = new System.Drawing.Point(0, 330);
+            this.richtextbox2.Name = "richtextbox2";
+            this.richtextbox2.size. = new System.Drawing.Size(800, 120);
+            this.richtextbox2.TabIndex = 2;
+            this.richtextbox2.Text = "";
             //
             // Form1
             //
@@ -100,10 +129,11 @@ namespace practica1
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
             this.Controls.Add(this.richTextBox1);
+            this.Controls.Add(this.richtextbox2);
             this.Controls.Add(this.menuStrip1);
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "Form1";
-            this.Text = "Form1";
+            this.Text = "Mi Compilador";
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             this.ResumeLayout(false);
@@ -121,5 +151,8 @@ namespace practica1
         private System.Windows.Forms.ToolStripMenuItem guardarComoToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem salirToolStripMenuItem;
         private System.Windows.Forms.RichTextBox richTextBox1;
+        private System.windows.Forms.ToolStripMenuItem compilarToolStripMenuItem;
+        private System.windows.Forms.ToolStripMenuItem analizarToolStripMenuItem;
+        private System.windows.forms.richtextbox richtextbox2;
     }
 }
