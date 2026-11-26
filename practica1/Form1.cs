@@ -106,5 +106,214 @@ namespace practica1
         {
             Application.Exit();
         }
+
+        private void richTextBox1_TextChanged(object sender, EventArgs e)
+        {
+            compilarToolStripMenuItem.Enabled = true;
+        }
+
+        private char Tipo_caracter(int caracter)
+        {
+            if (caracter >= 65 && caracter <= 90 || caracter >= 97 && caracter <= 122) return 'l';
+            if (caracter >= 48 && caracter <= 57) return 'd';
+
+            switch (caracter)
+            {
+                case 10: return 'n';
+                case 34: return '"';
+                case 39: return 'c';
+                case 32:
+                case 9:
+                case 13: return 'e';
+                case 47: return '/';
+                default: return 's';
+            }
+        }
+
+        private void Simbolo()
+        {
+            if (i_caracter == 33 ||
+                i_caracter >= 35 && i_caracter <= 38 ||
+                i_caracter >= 40 && i_caracter <= 45 ||
+                i_caracter >= 58 && i_caracter <= 62 ||
+                i_caracter == 91 ||
+                i_caracter == 93 ||
+                i_caracter == 94 ||
+                i_caracter >= 123 && i_caracter <= 125)
+            {
+                elemento = (char)i_caracter + "\n";
+            }
+            else
+            {
+                Error(i_caracter);
+            }
+        }
+
+        private void Cadena()
+        {
+            do
+            {
+                i_caracter = Leer.Read();
+                if (i_caracter == 10) Numero_linea++;
+            } while (i_caracter != 34 && i_caracter != -1);
+
+            if (i_caracter == -1) Error(34);
+        }
+
+        private void Caracter()
+        {
+            i_caracter = Leer.Read();
+            if (i_caracter == 92) i_caracter = Leer.Read();
+            i_caracter = Leer.Read();
+            if (i_caracter != 39) Error(39);
+        }
+
+        private void Archivo_Libreria()
+        {
+            i_caracter = Leer.Read();
+            if (i_caracter == 'h')
+            {
+                elemento = "libreria\n";
+                i_caracter = Leer.Read();
+            }
+            else
+            {
+                Error(i_caracter);
+            }
+        }
+
+        private bool Palabra_Reservada()
+        {
+            return P_Reservadas.Contains(elemento);
+        }
+
+        private void Identificador()
+        {
+            do
+            {
+                elemento += (char)i_caracter;
+                i_caracter = Leer.Read();
+            } while (Tipo_caracter(i_caracter) == 'l' || Tipo_caracter(i_caracter) == 'd');
+
+            if (Palabra_Reservada())
+            {
+                elemento += "\n";
+            }
+            else
+            {
+                switch (i_caracter)
+                {
+                    case '.': Archivo_Libreria(); break;
+                    case '(': elemento = "funcion\n"; break;
+                    default: elemento = "identificador\n"; break;
+                }
+            }
+        }
+
+        private bool Comentario()
+        {
+            i_caracter = Leer.Read();
+            switch (i_caracter)
+            {
+                case 47:
+                    do
+                    {
+                        i_caracter = Leer.Read();
+                    } while (i_caracter != 10 && i_caracter != -1);
+                    return true;
+
+                case 42:
+                    do
+                    {
+                        do
+                        {
+                            i_caracter = Leer.Read();
+                            if (i_caracter == 10) Numero_linea++;
+                        } while (i_caracter != 42 && i_caracter != -1);
+
+                        if (i_caracter != -1) i_caracter = Leer.Read();
+                        if (i_caracter == 10) Numero_linea++;
+                    } while (i_caracter != 47 && i_caracter != -1);
+
+                    if (i_caracter == -1) Error(42);
+                    else i_caracter = Leer.Read();
+                    return true;
+
+                default:
+                    return false;
+            }
+        }
+
+        private void Numero()
+        {
+            do
+            {
+                i_caracter = Leer.Read();
+            } while (Tipo_caracter(i_caracter) == 'd');
+
+            if (i_caracter == '.')
+            {
+                do
+                {
+                    i_caracter = Leer.Read();
+                } while (Tipo_caracter(i_caracter) == 'd');
+                elemento = "numero_real\n";
+            }
+            else
+            {
+                elemento = "numero_entero\n";
+            }
+        }
+
+        private void Error(int caracter)
+        {
+            richTextBox2.AppendText("Error léxico '" + (char)caracter + "', línea " + Numero_linea + "\n");
+            N_error++;
+            Escribir.Write("error\n");
+        }
+
+        private void analizarToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            richTextBox2.Text = "Analizando...\n";
+            guardar();
+            if (archivo == null)
+            {
+                richTextBox2.AppendText("Guarda el archivo antes de analizarlo.\n");
+                return;
+            }
+
+            N_error = 0;
+            Numero_linea = 1;
+            archivoback = Path.ChangeExtension(archivo, ".back");
+            Escribir = new StreamWriter(archivoback);
+            Leer = new StreamReader(archivo);
+
+            i_caracter = Leer.Read();
+            while (i_caracter != -1)
+            {
+                elemento = "";
+                switch (Tipo_caracter(i_caracter))
+                {
+                    case 'l': Identificador(); Escribir.Write(elemento); break;
+                    case 'd': Numero(); Escribir.Write(elemento); break;
+                    case 's': Simbolo(); Escribir.Write(elemento); i_caracter = Leer.Read(); break;
+                    case '"': Cadena(); Escribir.Write("cadena\n"); i_caracter = Leer.Read(); break;
+                    case 'c': Caracter(); Escribir.Write("caracter\n"); i_caracter = Leer.Read(); break;
+                    case '/':
+                        if (Comentario()) Escribir.Write("comentario\n");
+                        else Escribir.Write("/\n");
+                        break;
+                    case 'n': Escribir.Write("LF\n"); Numero_linea++; i_caracter = Leer.Read(); break;
+                    case 'e': i_caracter = Leer.Read(); break;
+                }
+            }
+
+            Escribir.Write("Fin");
+            Escribir.Close();
+            Leer.Close();
+
+            richTextBox2.AppendText("Errores léxicos: " + N_error + "\n");
+            if (N_error == 0) richTextBox2.AppendText("Análisis léxico terminado sin errores.\n");
+        }
     }
 }
