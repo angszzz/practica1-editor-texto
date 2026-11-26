@@ -114,14 +114,15 @@ namespace practica1
             this.richTextBox1.Text = "";
             this.richTextBox1.TextChanged += new System.EventHandler(this.richTextBox1_TextChanged);
             //
-            // richtextbox2
+            // richTextBox2
             //
-            this.richtextbox2.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.richtextbox2.Location = new System.Drawing.Point(0, 330);
-            this.richtextbox2.Name = "richtextbox2";
-            this.richtextbox2.size. = new System.Drawing.Size(800, 120);
-            this.richtextbox2.TabIndex = 2;
-            this.richtextbox2.Text = "";
+            this.richTextBox2.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.richTextBox2.Location = new System.Drawing.Point(0, 330);
+            this.richTextBox2.Name = "richTextBox2";
+            this.richTextBox2.ReadOnly = true;
+            this.richTextBox2.Size = new System.Drawing.Size(800, 120);
+            this.richTextBox2.TabIndex = 2;
+            this.richTextBox2.Text = "";
             //
             // Form1
             //
@@ -129,7 +130,7 @@ namespace practica1
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
             this.Controls.Add(this.richTextBox1);
-            this.Controls.Add(this.richtextbox2);
+            this.Controls.Add(this.richTextBox2);
             this.Controls.Add(this.menuStrip1);
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "Form1";
@@ -151,8 +152,8 @@ namespace practica1
         private System.Windows.Forms.ToolStripMenuItem guardarComoToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem salirToolStripMenuItem;
         private System.Windows.Forms.RichTextBox richTextBox1;
-        private System.windows.Forms.ToolStripMenuItem compilarToolStripMenuItem;
-        private System.windows.Forms.ToolStripMenuItem analizarToolStripMenuItem;
-        private System.windows.forms.richtextbox richtextbox2;
+        private System.Windows.Forms.ToolStripMenuItem compilarToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem analizarToolStripMenuItem;
+        private System.Windows.Forms.RichTextBox richTextBox2;
     }
 }
