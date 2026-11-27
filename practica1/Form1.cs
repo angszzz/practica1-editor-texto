@@ -12,7 +12,7 @@ namespace practica1
         StreamWriter Escribir;
         StreamReader Leer;
         int i_caracter, N_error, Numero_linea;
-                string token;
+        string token;
 
         readonly List<string> P_Res_Tipo = new List<string>
         {
@@ -417,12 +417,116 @@ namespace practica1
 
         private void Declaracion()
         {
-            while (token != ";" && token != "LF" && token != "Fin")
+            switch (token)
+            {
+                case "identificador": Dec_VGlobal(); break;
+                case "funcion": Dec_Funcion(); break;
+                default: ErrorS(token, "declaración global válida"); break;
+            }
+        }
+
+        private void Dec_VGlobal()
+        {
+            token = Siguiente();
+            switch (token)
+            {
+                case "=":
+                    if (Constante() == 1)
+                    {
+                        token = Siguiente();
+                        if (token == ";") token = Siguiente();
+                        else ErrorS(token, ";");
+                    }
+                    else
+                    {
+                        ErrorS(token, "inicialización global válida");
+                    }
+                    break;
+                case "[": D_Arreglos(); break;
+                case ";": token = Siguiente(); break;
+                default: ErrorS(token, ";"); break;
+            }
+        }
+
+        private int Constante()
+        {
+            token = Siguiente();
+            switch (token)
+            {
+                case "-":
+                    token = Siguiente();
+                    if (token == "numero_real" || token == "numero_entero" || token == "identificador") return 1;
+                    else return 0;
+                case "numero_real": return 1;
+                case "numero_entero": return 1;
+                case "caracter": return 1;
+                case "identificador": return 1;
+                default: return 0;
+            }
+        }
+
+        private void D_Arreglos()
+        {
+            do
             {
                 token = Siguiente();
+                if (token != "numero_entero")
+                {
+                    ErrorS(token, "tamaño del arreglo");
+                    return;
+                }
+                token = Siguiente();
+                if (token != "]")
+                {
+                    ErrorS(token, "]");
+                    return;
+                }
+                token = Siguiente();
+            } while (token == "[");
+
+            switch (token)
+            {
+                case ";": token = Siguiente(); break;
+                case "=":
+                    token = Siguiente();
+                    if (token != "{")
+                    {
+                        ErrorS(token, "{");
+                        return;
+                    }
+                    if (!Lista_Valores()) return;
+                    token = Siguiente();
+                    if (token == ";") token = Siguiente();
+                    else ErrorS(token, ";");
+                    break;
+                default: ErrorS(token, ";"); break;
             }
-            if (token == ";") token = Siguiente();
-            else ErrorS(token, ";");
+        }
+
+        private bool Lista_Valores()
+        {
+            do
+            {
+                if (Constante() == 0)
+                {
+                    if (token != "{")
+                    {
+                        ErrorS(token, "valor constante");
+                        return false;
+                    }
+                    if (!Lista_Valores()) return false;
+                }
+                token = Siguiente();
+            } while (token == ",");
+
+            if (token == "}") return true;
+            ErrorS(token, "}");
+            return false;
+        }
+
+        private void Dec_Funcion()
+        {
+            Saltar_linea();
         }
 
         private void F_Main()
