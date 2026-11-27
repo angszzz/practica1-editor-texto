@@ -8,11 +8,66 @@ Cada práctica vive en su propia rama. La práctica más reciente aparece primer
 
 | Práctica | Rama | Qué agrega |
 |---|---|---|
+| 5. Análisis sintáctico: declaraciones globales | `practica5` | Verificación de la declaración de variables globales y de arreglos. |
 | 4. Análisis sintáctico: `#include` | `practica4` | Verificación de la cabecera del programa y de la directiva de procesador `#include`. |
 | 2. Análisis léxico | `practica2` | Lectura del archivo fuente carácter por carácter, reconocimiento de tokens y reporte de errores léxicos. |
 | 1. Editor de texto | `main` | Editor tipo Bloc de notas con el menú Archivo. |
 
 La práctica 3 fue un reporte independiente sobre traductores y no modifica este proyecto.
+
+---
+
+## Práctica 5: Declaración de variables globales y arreglos
+
+Continúa el analizador sintáctico de la práctica 4. Además de las directivas `#include`, ahora revisa la estructura de cada declaración global que aparece antes de `main`.
+
+### Qué verifica
+
+| Declaración | Ejemplo |
+|---|---|
+| Variable sin valor inicial | `int a;` |
+| Variable con valor inicial, incluso negativo | `float b = -3.1415;` |
+| Arreglo de una o varias dimensiones | `int A[3][3];` |
+| Arreglo con valores iniciales | `int A[3][3] = {{1,2,3},{4,5,6},{7,8,9}};` |
+
+Los valores iniciales pueden ser números enteros, números reales, caracteres o identificadores. Las declaraciones de funciones se aceptan sin revisar; su estructura queda para una práctica posterior.
+
+### Cómo funciona
+
+| Función | Qué revisa |
+|---|---|
+| `Declaracion` | Si después del tipo viene una variable o una función |
+| `Dec_VGlobal` | Lo que sigue al nombre: `;`, `= constante ;` o `[` |
+| `Constante` | Que el valor sea una constante válida |
+| `D_Arreglos` | Las dimensiones `[n]` y los valores iniciales |
+| `Lista_Valores` | Los valores entre llaves; se llama a sí misma para cada fila de una matriz |
+
+### Ejemplo
+
+Para este archivo:
+
+```c
+int a
+float b = ;
+int A[3 = {1};
+int B[2] = {1, 2;
+int = 5;
+int C[2] = {1, , 3};
+int main
+```
+
+La caja de mensajes muestra:
+
+```
+Analizando sintaxis...
+Línea 1: error de sintaxis 'salto de línea', se esperaba ;
+Línea 2: error de sintaxis ';', se esperaba inicialización global válida
+Línea 3: error de sintaxis '=', se esperaba ]
+Línea 4: error de sintaxis ';', se esperaba }
+Línea 5: error de sintaxis '=', se esperaba declaración global válida
+Línea 6: error de sintaxis ',', se esperaba valor constante
+Errores sintácticos: 6
+```
 
 ---
 
