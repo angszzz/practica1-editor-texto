@@ -8,12 +8,64 @@ Cada práctica vive en su propia rama. La práctica más reciente aparece primer
 
 | Práctica | Rama | Qué agrega |
 |---|---|---|
+| 6. Análisis sintáctico: función principal | `practica6` | Verificación de `main`, su bloque de sentencias, las declaraciones locales y las asignaciones. |
 | 5. Análisis sintáctico: declaraciones globales | `practica5` | Verificación de la declaración de variables globales y de arreglos. |
 | 4. Análisis sintáctico: `#include` | `practica4` | Verificación de la cabecera del programa y de la directiva de procesador `#include`. |
 | 2. Análisis léxico | `practica2` | Lectura del archivo fuente carácter por carácter, reconocimiento de tokens y reporte de errores léxicos. |
 | 1. Editor de texto | `main` | Editor tipo Bloc de notas con el menú Archivo. |
 
 La práctica 3 fue un reporte independiente sobre traductores y no modifica este proyecto.
+
+---
+
+## Práctica 6: Función principal
+
+Continúa el analizador sintáctico. Hasta la práctica 5, el análisis terminaba al encontrar `main`; ahora revisa también la función principal completa.
+
+### Qué verifica
+
+- **Encabezado:** `main` seguido de `(` y `)`.
+- **Bloque de sentencias:** que abra con `{` y cierre con `}`.
+- **Declaraciones locales:** una o varias variables del mismo tipo separadas por comas, cada una con valor inicial opcional, o un arreglo, como `float Area,base,altura=10.0;`.
+- **Asignaciones:** a una variable o a un elemento de un arreglo, como `base=155.0;` o `b[1][1]=5;`.
+
+Los comentarios y las líneas vacías dentro del bloque se ignoran. Después de un error, el analizador salta al final de la sentencia y continúa con la siguiente, para mostrar un solo mensaje por error.
+
+### Cómo funciona
+
+| Función | Qué revisa |
+|---|---|
+| `F_Main` | `main ( )` y luego el bloque |
+| `Bloque_Sentencias` | `{`, cada sentencia hasta `}` |
+| `Sentencia` | Si empieza con un tipo es una declaración; si empieza con un nombre, una asignación |
+| `Declaracion_Local` | Variables separadas por comas con valor opcional, o un arreglo, hasta `;` |
+| `Asignacion` | `nombre [índices] = constante ;` |
+| `Saltar_Sentencia` | Recuperación después de un error |
+| `Saltar_Vacios` | Ignora saltos de línea y comentarios |
+
+### Ejemplo
+
+Para este archivo, al que le falta el `;` en la línea 6:
+
+```c
+#include <stdio.h>
+int main()
+{
+    float Area,base,altura=10.0;
+    int b[2][3]={{1,2},{3,4}};
+    base=155.0
+    b[1][1]=5;
+
+}
+```
+
+La caja de mensajes muestra:
+
+```
+Analizando sintaxis...
+Línea 6: error de sintaxis 'salto de línea', se esperaba ;
+Errores sintácticos: 1
+```
 
 ---
 
