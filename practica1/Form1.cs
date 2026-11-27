@@ -560,9 +560,9 @@ namespace practica1
             while (token != "}" && token != "Fin")
             {
                 int errores = N_error;
-                bool esIf = token == "if";
+                bool esEstructura = token == "if" || token == "switch";
                 Sentencia();
-                if (N_error > errores && !esIf) Saltar_Sentencia();
+                if (N_error > errores && !esEstructura) Saltar_Sentencia();
                 Saltar_Vacios();
             }
             if (token == "}") token = Siguiente();
@@ -576,6 +576,7 @@ namespace practica1
             else if (token == "if") Sentencia_If();
             else if (token == "return") Sentencia_Return();
             else if (token == "break") Sentencia_Break();
+            else if (token == "switch") Sentencia_Switch();
             else ErrorS(token, "sentencia válida");
         }
 
@@ -631,6 +632,81 @@ namespace practica1
             token = Siguiente();
             if (token == ";") token = Siguiente();
             else ErrorS(token, ";");
+        }
+
+        private void Sentencia_Switch()
+        {
+            int errores = N_error;
+            token = Siguiente();
+            if (token != "(") ErrorS(token, "(");
+            else if (Constante() == 0) ErrorS(token, "expresión");
+            else
+            {
+                token = Siguiente();
+                if (token == ")") token = Siguiente();
+                else ErrorS(token, ")");
+            }
+
+            if (N_error > errores)
+            {
+                while (token != "{" && token != "LF" && token != "Fin")
+                {
+                    token = Siguiente();
+                }
+            }
+
+            Saltar_Vacios();
+            if (token != "{")
+            {
+                ErrorS(token, "{");
+                return;
+            }
+            token = Siguiente();
+            Saltar_Vacios();
+
+            while (token != "}" && token != "Fin")
+            {
+                errores = N_error;
+                if (token == "case")
+                {
+                    if (Constante() == 0) ErrorS(token, "valor constante");
+                    else
+                    {
+                        token = Siguiente();
+                        if (token == ":") token = Siguiente();
+                        else ErrorS(token, ":");
+                    }
+                }
+                else if (token == "default")
+                {
+                    token = Siguiente();
+                    if (token == ":") token = Siguiente();
+                    else ErrorS(token, ":");
+                }
+                else
+                {
+                    ErrorS(token, "case o default");
+                }
+
+                if (N_error > errores) Saltar_Sentencia();
+                Sentencias_Caso();
+            }
+
+            if (token == "}") token = Siguiente();
+            else ErrorS(token, "}");
+        }
+
+        private void Sentencias_Caso()
+        {
+            Saltar_Vacios();
+            while (token != "case" && token != "default" && token != "}" && token != "Fin")
+            {
+                int errores = N_error;
+                bool esEstructura = token == "if" || token == "switch";
+                Sentencia();
+                if (N_error > errores && !esEstructura) Saltar_Sentencia();
+                Saltar_Vacios();
+            }
         }
 
         private void Declaracion_Local()
