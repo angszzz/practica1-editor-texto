@@ -8,6 +8,7 @@ Cada práctica vive en su propia rama. La práctica más reciente aparece primer
 
 | Práctica | Rama | Qué agrega |
 |---|---|---|
+| 7. Análisis sintáctico: condicional `if-else` | `practica7` | Verificación de `if`, `if-else`, `return` y `break` dentro de los bloques. |
 | 6. Análisis sintáctico: función principal | `practica6` | Verificación de `main`, su bloque de sentencias, las declaraciones locales y las asignaciones. |
 | 5. Análisis sintáctico: declaraciones globales | `practica5` | Verificación de la declaración de variables globales y de arreglos. |
 | 4. Análisis sintáctico: `#include` | `practica4` | Verificación de la cabecera del programa y de la directiva de procesador `#include`. |
@@ -15,6 +16,65 @@ Cada práctica vive en su propia rama. La práctica más reciente aparece primer
 | 1. Editor de texto | `main` | Editor tipo Bloc de notas con el menú Archivo. |
 
 La práctica 3 fue un reporte independiente sobre traductores y no modifica este proyecto.
+
+---
+
+## Práctica 7: Estructura condicional IF-ELSE
+
+Continúa el analizador sintáctico. Además de declaraciones locales y asignaciones, los bloques de sentencias ahora aceptan la estructura condicional y las sentencias `return` y `break`.
+
+### Qué verifica
+
+| Sentencia | Estructura |
+|---|---|
+| Condicional simple | `if ( condición ) { ... }` |
+| Condicional compuesta | `if ( condición ) { ... } else { ... }` |
+| `return` | `return ;` o `return valor ;` |
+| `break` | `break ;` |
+
+La condición es un valor: un identificador o un número, como `if(altura)`. Los bloques del `if` y del `else` se revisan igual que el bloque de `main`, así que pueden contener cualquier sentencia, incluso otro `if`.
+
+### Cómo funciona
+
+| Función | Qué revisa |
+|---|---|
+| `Sentencia` | Ahora también reconoce `if`, `return` y `break` |
+| `Sentencia_If` | `if`, la condición entre paréntesis, el bloque verdadero y, si hay `else`, el bloque falso |
+| `Sentencia_Return` | `return` con valor opcional y `;` |
+| `Sentencia_Break` | `break ;` |
+
+Si el encabezado del `if` tiene un error, el analizador avanza hasta la llave del bloque y lo revisa de todos modos, para no generar errores falsos en el resto de la función.
+
+### Ejemplo
+
+Para este archivo, al que le falta el `)` de la condición en la línea 8:
+
+```c
+#include <stdio.h>
+int main()
+{
+    float Area,base,altura;
+    int b[2][3]={{1,2},{3,4}};
+    b[1][1]=5;
+
+    if(altura
+        {
+          base=155.0;
+        }
+    else
+        {
+        }
+
+}
+```
+
+La caja de mensajes muestra:
+
+```
+Analizando sintaxis...
+Línea 8: error de sintaxis 'salto de línea', se esperaba )
+Errores sintácticos: 1
+```
 
 ---
 
