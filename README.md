@@ -8,6 +8,7 @@ Cada práctica vive en su propia rama. La práctica más reciente aparece primer
 
 | Práctica | Rama | Qué agrega |
 |---|---|---|
+| 8. Análisis sintáctico: selección múltiple `switch` | `practica8` | Verificación de `switch` con sus etiquetas `case` y `default` y las sentencias de cada caso. |
 | 7. Análisis sintáctico: condicional `if-else` | `practica7` | Verificación de `if`, `if-else`, `return` y `break` dentro de los bloques. |
 | 6. Análisis sintáctico: función principal | `practica6` | Verificación de `main`, su bloque de sentencias, las declaraciones locales y las asignaciones. |
 | 5. Análisis sintáctico: declaraciones globales | `practica5` | Verificación de la declaración de variables globales y de arreglos. |
@@ -16,6 +17,65 @@ Cada práctica vive en su propia rama. La práctica más reciente aparece primer
 | 1. Editor de texto | `main` | Editor tipo Bloc de notas con el menú Archivo. |
 
 La práctica 3 fue un reporte independiente sobre traductores y no modifica este proyecto.
+
+---
+
+## Práctica 8: Estructura de selección múltiple SWITCH
+
+Continúa el analizador sintáctico. Los bloques de sentencias ahora aceptan la estructura `switch`.
+
+### Qué verifica
+
+| Parte | Estructura |
+|---|---|
+| Encabezado | `switch ( expresión ) {` |
+| Caso | `case valor :` seguido de cero o más sentencias |
+| Caso por omisión | `default :` seguido de cero o más sentencias |
+| Cierre | `}` |
+
+La expresión es un valor, como `switch(opcion)`. El valor de cada `case` puede ser un número o un carácter, como `case 1:` o `case 'a':`. Un caso puede estar vacío y el `break` no es obligatorio, igual que en C.
+
+### Cómo funciona
+
+| Función | Qué revisa |
+|---|---|
+| `Sentencia` | Ahora también reconoce `switch` |
+| `Sentencia_Switch` | La expresión entre paréntesis, la llave de apertura, cada etiqueta `case` o `default` con sus `:` y la llave de cierre |
+| `Sentencias_Caso` | Las sentencias de un caso, hasta la siguiente etiqueta o la llave de cierre |
+
+Las sentencias de cada caso se revisan con la misma función `Sentencia`, así que dentro de un caso puede ir cualquier sentencia ya reconocida. Igual que el `if`, si el encabezado del `switch` tiene un error, el analizador avanza hasta su llave para no generar errores falsos.
+
+### Ejemplo
+
+Para este archivo, al que le faltan los `:` del caso `'a'` en la línea 10:
+
+```c
+#include <stdio.h>
+int main()
+{
+    int opcion;
+
+    switch(opcion)
+    {
+        case 1:
+               break;
+        case 'a'
+               break;
+        case 2:
+               break;
+        default:
+    }
+
+}
+```
+
+La caja de mensajes muestra:
+
+```
+Analizando sintaxis...
+Línea 10: error de sintaxis 'salto de línea', se esperaba :
+Errores sintácticos: 1
+```
 
 ---
 
