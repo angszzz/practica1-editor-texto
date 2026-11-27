@@ -532,6 +532,131 @@ namespace practica1
         private void F_Main()
         {
             token = Siguiente();
+            if (token != "(")
+            {
+                ErrorS(token, "(");
+                return;
+            }
+            token = Siguiente();
+            if (token != ")")
+            {
+                ErrorS(token, ")");
+                return;
+            }
+            token = Siguiente();
+            Bloque_Sentencias();
+        }
+
+        private void Bloque_Sentencias()
+        {
+            Saltar_Vacios();
+            if (token != "{")
+            {
+                ErrorS(token, "{");
+                return;
+            }
+            token = Siguiente();
+            Saltar_Vacios();
+            while (token != "}" && token != "Fin")
+            {
+                int errores = N_error;
+                Sentencia();
+                if (N_error > errores) Saltar_Sentencia();
+                Saltar_Vacios();
+            }
+            if (token == "}") token = Siguiente();
+            else ErrorS(token, "}");
+        }
+
+        private void Sentencia()
+        {
+            if (P_Res_Tipo.Contains(token)) Declaracion_Local();
+            else if (token == "identificador") Asignacion();
+            else ErrorS(token, "sentencia válida");
+        }
+
+        private void Declaracion_Local()
+        {
+            do
+            {
+                token = Siguiente();
+                if (token != "identificador")
+                {
+                    ErrorS(token, "identificador");
+                    return;
+                }
+                token = Siguiente();
+                if (token == "[")
+                {
+                    D_Arreglos();
+                    return;
+                }
+                if (token == "=")
+                {
+                    if (Constante() == 0)
+                    {
+                        ErrorS(token, "valor constante");
+                        return;
+                    }
+                    token = Siguiente();
+                }
+            } while (token == ",");
+
+            if (token == ";") token = Siguiente();
+            else ErrorS(token, ";");
+        }
+
+        private void Asignacion()
+        {
+            token = Siguiente();
+            while (token == "[")
+            {
+                token = Siguiente();
+                if (token != "numero_entero" && token != "identificador")
+                {
+                    ErrorS(token, "índice del arreglo");
+                    return;
+                }
+                token = Siguiente();
+                if (token != "]")
+                {
+                    ErrorS(token, "]");
+                    return;
+                }
+                token = Siguiente();
+            }
+
+            if (token != "=")
+            {
+                ErrorS(token, "=");
+                return;
+            }
+            if (Constante() == 0)
+            {
+                ErrorS(token, "valor constante");
+                return;
+            }
+            token = Siguiente();
+            if (token == ";") token = Siguiente();
+            else ErrorS(token, ";");
+        }
+
+        private void Saltar_Sentencia()
+        {
+            while (token != ";" && token != "LF" && token != "}" && token != "Fin")
+            {
+                token = Siguiente();
+            }
+            if (token == ";") token = Siguiente();
+        }
+
+        private void Saltar_Vacios()
+        {
+            while (token == "LF" || token == "comentario" || token == "")
+            {
+                if (token == "LF") Numero_linea++;
+                token = Siguiente();
+            }
         }
 
         private void Definicion_funcion()
