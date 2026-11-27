@@ -560,8 +560,9 @@ namespace practica1
             while (token != "}" && token != "Fin")
             {
                 int errores = N_error;
+                bool esIf = token == "if";
                 Sentencia();
-                if (N_error > errores) Saltar_Sentencia();
+                if (N_error > errores && !esIf) Saltar_Sentencia();
                 Saltar_Vacios();
             }
             if (token == "}") token = Siguiente();
@@ -572,7 +573,64 @@ namespace practica1
         {
             if (P_Res_Tipo.Contains(token)) Declaracion_Local();
             else if (token == "identificador") Asignacion();
+            else if (token == "if") Sentencia_If();
+            else if (token == "return") Sentencia_Return();
+            else if (token == "break") Sentencia_Break();
             else ErrorS(token, "sentencia válida");
+        }
+
+        private void Sentencia_If()
+        {
+            int errores = N_error;
+            token = Siguiente();
+            if (token != "(") ErrorS(token, "(");
+            else if (Constante() == 0) ErrorS(token, "condición");
+            else
+            {
+                token = Siguiente();
+                if (token == ")") token = Siguiente();
+                else ErrorS(token, ")");
+            }
+
+            if (N_error > errores)
+            {
+                while (token != "{" && token != "LF" && token != "Fin")
+                {
+                    token = Siguiente();
+                }
+            }
+
+            Bloque_Sentencias();
+            Saltar_Vacios();
+            if (token == "else")
+            {
+                token = Siguiente();
+                Bloque_Sentencias();
+            }
+        }
+
+        private void Sentencia_Return()
+        {
+            token = Siguiente();
+            if (token != ";")
+            {
+                if (token == "-") token = Siguiente();
+                if (token != "numero_entero" && token != "numero_real" && token != "identificador" && token != "caracter")
+                {
+                    ErrorS(token, "valor o ;");
+                    return;
+                }
+                token = Siguiente();
+            }
+            if (token == ";") token = Siguiente();
+            else ErrorS(token, ";");
+        }
+
+        private void Sentencia_Break()
+        {
+            token = Siguiente();
+            if (token == ";") token = Siguiente();
+            else ErrorS(token, ";");
         }
 
         private void Declaracion_Local()
