@@ -12,6 +12,12 @@ namespace practica1
         StreamWriter Escribir;
         StreamReader Leer;
         int i_caracter, N_error, Numero_linea;
+                string token;
+
+        readonly List<string> P_Res_Tipo = new List<string>
+        {
+            "char", "double", "float", "int", "long", "short", "signed", "unsigned", "void"
+        };
 
         readonly List<string> P_Reservadas = new List<string>
         {
@@ -19,7 +25,7 @@ namespace practica1
             "double", "else", "enum", "extern", "float", "for", "goto", "if",
             "int", "long", "register", "return", "short", "signed", "sizeof", "static",
             "struct", "switch", "typedef", "union", "unsigned", "void", "volatile", "while",
-            "include", "define"
+            "include", "define", "main"
         };
 
         public Form1()
@@ -228,11 +234,11 @@ namespace practica1
                         do
                         {
                             i_caracter = Leer.Read();
-                            if (i_caracter == 10) Numero_linea++;
+                            if (i_caracter == 10) { Numero_linea++; Escribir.Write("LF\n"); }
                         } while (i_caracter != 42 && i_caracter != -1);
 
                         if (i_caracter != -1) i_caracter = Leer.Read();
-                        if (i_caracter == 10) Numero_linea++;
+                        if (i_caracter == 10) { Numero_linea++; Escribir.Write("LF\n"); }
                     } while (i_caracter != 47 && i_caracter != -1);
 
                     if (i_caracter == -1) Error(42);
@@ -313,7 +319,127 @@ namespace practica1
             Leer.Close();
 
             richTextBox2.AppendText("Errores léxicos: " + N_error + "\n");
-            if (N_error == 0) richTextBox2.AppendText("Análisis léxico terminado sin errores.\n");
+            if (N_error == 0) A_Sintactico();
+        }
+
+        private void A_Sintactico()
+        {
+            richTextBox2.AppendText("\nAnalizando sintaxis...\n");
+            N_error = 0;
+            Numero_linea = 1;
+            Leer = new StreamReader(archivoback);
+
+            if (Cabecera())
+            {
+                F_Main();
+                if (token != "Fin") Definicion_funcion();
+            }
+            else
+            {
+                ErrorS(token, "función main()");
+            }
+
+            richTextBox2.AppendText("Errores sintácticos: " + N_error + "\n");
+            Leer.Close();
+        }
+
+        private string Siguiente()
+        {
+            return Leer.ReadLine() ?? "Fin";
+        }
+
+        private bool Cabecera()
+        {
+            token = Siguiente();
+            do
+            {
+                if (P_Res_Tipo.Contains(token)) token = "tipo";
+                switch (token)
+                {
+                    case "#": Directriz(); break;
+                    case "tipo":
+                        token = Siguiente();
+                        if (token == "main") return true;
+                        Declaracion();
+                        break;
+                    case "": token = Siguiente(); break;
+                    case "LF": Numero_linea++; token = Siguiente(); break;
+                    default: token = Siguiente(); break;
+                }
+            } while (token != "Fin" && token != "main");
+            return false;
+        }
+
+        private void Directriz()
+        {
+            token = Siguiente();
+            switch (token)
+            {
+                case "include": Include(); break;
+                case "define":
+                case "if":
+                    Saltar_linea();
+                    break;
+                default: ErrorS(token, "directriz de procesador"); break;
+            }
+        }
+
+        private void Include()
+        {
+            token = Siguiente();
+            switch (token)
+            {
+                case "<":
+                    token = Siguiente();
+                    if (token == "libreria")
+                    {
+                        token = Siguiente();
+                        if (token == ">") token = Siguiente();
+                        else ErrorS(token, ">");
+                    }
+                    else
+                    {
+                        ErrorS(token, "nombre de archivo librería");
+                    }
+                    break;
+                case "cadena": token = Siguiente(); break;
+                default: ErrorS(token, "inclusión válida"); break;
+            }
+        }
+
+        private void Saltar_linea()
+        {
+            do
+            {
+                token = Siguiente();
+            } while (token != "LF" && token != "Fin");
+        }
+
+        private void Declaracion()
+        {
+            while (token != ";" && token != "LF" && token != "Fin")
+            {
+                token = Siguiente();
+            }
+            if (token == ";") token = Siguiente();
+            else ErrorS(token, ";");
+        }
+
+        private void F_Main()
+        {
+            token = Siguiente();
+        }
+
+        private void Definicion_funcion()
+        {
+        }
+
+        private void ErrorS(string e, string s)
+        {
+            if (e == "LF") e = "salto de línea";
+            richTextBox2.AppendText("Línea " + Numero_linea + ": error de sintaxis '" + e + "', se esperaba " + s + "\n");
+            N_error++;
+            if (token != "LF") token = "";
         }
     }
 }
